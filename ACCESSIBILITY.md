@@ -14,7 +14,7 @@
 | **1** | `button:focus, input:focus, a:focus { outline: none; }` | **Suppression totale des indicateurs de focus visuels.** | **Critique / Bloquant** : Tout utilisateur naviguant au clavier (personnes avec handicap moteur ou n'utilisant pas de souris) navigue « à l'aveugle », sans savoir quel élément est sélectionné. |
 | **2** | `<div className="brand" onClick="...">` et `<div className="film-card" onClick="...">` | **Composants interactifs construits avec de simples `<div>`.** | **Critique** : Les `<div>` ne sont ni focalisables avec la touche `Tab`, ni activables avec `Enter` ou `Espace`, et ne possèdent aucun rôle dans l'arbre d'accessibilité pour les lecteurs d'écran (VoiceOver, NVDA). |
 | **3** | `<input className="search" placeholder="Rechercher un film" />` | **Champ de formulaire sans balise `<label>` associée.** | **Majeur** : Le placeholder disparaît dès la saisie et n'est pas lu de manière fiable comme nom accessible par les technologies d'assistance. |
-| **4** | `<img src={film.poster} />` et pastille `<div className="availability available" />` | **Absence d'attributs `alt` sur les affiches et information de disponibilité transmise uniquement par la couleur.** | **Majeur** : Les personnes non-voyantes n'ont aucune information sur l'affiche, et les personnes daltoniennes ne peuvent distinguer avec certitude si une séance est disponible ou complète. |
+| **4** | `<img src={film.poster} />` et pastille `<div className="availability available" />` | **Absence d'attributs `alt` sur les affiches et information de disponibilité transmise uniquement par la couleur (cercle rouge/vert).** | **Majeur** : Violation du critère **WCAG 1.4.1 (Use of Color)**. Les personnes aveugles n'ont aucune information sur l'affiche, et les personnes daltoniennes (protanopie, deutéranopie, achromatopsie) ne peuvent pas distinguer la disponibilité. |
 | **5** | `<button className="favorite">{favorites.includes(film.id) ? "★" : "☆"}</button>` | **Bouton d'état sans nom accessible (`aria-label`) ni attribut d'état (`aria-pressed`).** | **Moyen / Majeur** : Le lecteur d'écran prononce uniquement « étoile noire » ou « étoile blanche », sans indiquer l'action (« Ajouter aux favoris ») ni à quel film elle se rapporte. |
 
 ---
@@ -38,12 +38,12 @@
   2. La sélection des cartes transformée en `<button type="button" className="film-card-action">` encapsulé dans un élément sémantique `<article>`.
   3. Chaque bouton dispose d'un nom accessible explicite (`aria-label="Sélectionner la séance du film Après l'aube"`).
 
-### C. Restructuration Sémantique des Formulaires et Textes Alternatifs
-- **Pourquoi :** L'accessibilité d'un formulaire repose sur l'association programmatique explicite entre le libellé et le champ de saisie (`for` / `id`). De même, les informations graphiques doivent être doublées textuellement.
+### C. Restructuration Sémantique des Formulaires, Images et Badges Textuels Explicites (WCAG 1.4.1)
+- **Pourquoi :** L'accessibilité d'un formulaire repose sur l'association programmatique explicite entre le libellé et le champ de saisie (`for` / `id`). De plus, **la couleur ne doit jamais être le seul vecteur d'information**.
 - **Correction apportée :**
   1. Création d'un vrai `<label htmlFor="film-search">` associé à l'<`input id="film-search">`.
   2. Ajout d'attributs `alt="Affiche officielle du film [Titre]"` sur chaque image.
-  3. Doublage textuel de la disponibilité via une balise masquée visuellement `<span className="sr-only">Séance disponible</span>`, garantissant une compréhension universelle sans impacter le design graphique.
+  3. **Remplacement du simple rond de couleur par un badge textuel complet et visible** : `● Places disponibles` (sur fond vert clair avec texte vert foncé `#14532d`, contraste **> 9:1**) et `● Séance complète` (sur fond rouge clair avec texte rouge foncé `#7f1d1d`, contraste **> 9:1**). Cela garantit une lisibilité immédiate pour tous les types de daltonisme et une restitution parfaite aux lecteurs d'écran.
 
 ---
 
@@ -55,7 +55,7 @@
 | **Recherche de films** | `input` isolé, placeholder volatil, aucun retour vocal sur le nombre de résultats. | `<label>` permanent, description dynamique masquée (`aria-live="polite"`) annonçant le nombre de résultats trouvés. | Compréhension immédiate pour les personnes déficientes visuelles ou cognitives. |
 | **Sélection d'un film** | Simple affichage textuel non notifié aux technologies d'assistance. | Zone de notification avec `role="status"` et `aria-live="polite"`. | Le lecteur d'écran annonce vocalement la sélection dès qu'elle se produit, sans interrompre l'utilisateur. |
 | **Bouton Favori** | Symbole Unicode ambigu (`★` / `☆`) sans contexte. | `aria-pressed="true|false"` + `aria-label="Ajouter / Retirer [Film] des favoris"`. | L'utilisateur sait exactement quel film il met en favori et quel est l'état actuel du bouton. |
-| **Disponibilité des séances** | Simple pastille de couleur verte ou rouge. | Pastille + infobulle (`title`) + texte d'accessibilité masqué (`.sr-only`). | Compréhensible par les daltoniens et lu explicitement par les synthèses vocales. |
+| **Disponibilité des séances** | Simple pastille ronde de couleur verte ou rouge (illisible pour les daltoniens). | **Badge textuel complet visible (`● Places disponibles` / `● Séance complète`)** avec contrastes WCAG AAA. | Information compréhensible à 100% par tous (daltoniens, basse vision, lecteurs d'écran). |
 | **Structure globale** | `div` imbriquées, hiérarchie de titres incohérente (`h1` vers `h4`). | Balises HTML5 landmarks (`<header>`, `<nav>`, `<main>`, `<article>`, `<footer>`, `<h1>`, `<h3>`). | Permet la navigation par régions et par niveaux de titres sur lecteur d'écran. |
 
 ---
@@ -80,6 +80,7 @@ La règle fondamentale édictée par le W3C (*First Rule of ARIA Use*) stipule :
 ## 5. Préservation de l'Apparence Visuelle
 
 Toutes les améliorations ont été intégrées en respectant scrupuleusement la charte graphique et la disposition d'origine :
-- Utilisation de la classe utilitaire standard `.sr-only` (*Screen Reader Only*) pour enrichir le flux sémantique sans modifier l'alignement visuel.
+- Utilisation de badges modernes au design soigné (fond pastel, typographie nette, pastille colorée de repère).
+- Utilisation de la classe utilitaire standard `.sr-only` (*Screen Reader Only*) pour enrichir le flux sémantique sans modifier l'alignement visuel quand nécessaire.
 - Réinitialisation propre des styles de boutons (`.film-card-action`, `.brand-btn`) pour conserver l'aspect moderne des cartes et de la topbar.
 - Ajout harmonieux du pied de page (*footer*) identifiant le projet et le binôme **Thomas Polverelli & Clément Pasteau**.

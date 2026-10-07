@@ -105,19 +105,21 @@ export default function App() {
                     onClick={() => setSelected(film.title)}
                     aria-label={`Sélectionner la séance du film ${film.title}`}
                   >
-                    <img
-                      src={film.poster}
-                      alt={`Affiche officielle du film ${film.title}`}
-                    />
+                    <div className="poster-container">
+                      <img
+                        src={film.poster}
+                        alt={`Affiche officielle du film ${film.title}`}
+                      />
+                    </div>
 
                     <div className="film-content">
-                      {/* Statut de disponibilité avec texte alternatif pour l'accessibilité */}
-                      <div
-                        className={film.available ? "availability available" : "availability unavailable"}
-                        title={film.available ? "Séance disponible" : "Séance complète"}
-                      >
-                        <span className="sr-only">
-                          {film.available ? "Séance disponible" : "Séance complète"}
+                      {/* Statut de disponibilité textuel explicite (WCAG 1.4.1 - Use of Color) */}
+                      <div className="availability-wrapper">
+                        <span
+                          className={`availability-badge ${film.available ? "badge-available" : "badge-unavailable"}`}
+                        >
+                          <span className="badge-dot" aria-hidden="true" />
+                          {film.available ? "Places disponibles" : "Séance complète"}
                         </span>
                       </div>
 
