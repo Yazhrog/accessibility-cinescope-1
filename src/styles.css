@@ -1,24 +1,349 @@
-:root { font-family: Inter, system-ui, sans-serif; color: #202536; background: #f4f2ee; }
-* { box-sizing: border-box; }
-body { margin: 0; }
-button, input { font: inherit; }
-button:focus, input:focus, a:focus { outline: none; }
-.topbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem max(1.25rem, calc((100% - 70rem) / 2)); background: #16192a; color: white; }
-.brand { font-size: 1.35rem; font-weight: 800; cursor: pointer; }
-.menu { display: flex; gap: 1.25rem; }
-.menu a { color: #dadbea; text-decoration: none; }
-.page { width: min(70rem, calc(100% - 2.5rem)); margin: 2.5rem auto; }
-.intro { color: #626779; }
-.search { width: min(28rem, 100%); padding: .8rem 1rem; border: 1px solid #b9bcc7; border-radius: .5rem; margin: 1rem 0 2rem; }
-.film-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.25rem; }
-.film-card { position: relative; overflow: hidden; border-radius: .8rem; background: white; box-shadow: 0 4px 18px #23263a1c; cursor: pointer; }
-.film-card img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
-.film-content { position: relative; padding: 1rem; }
-.film-content h4 { margin: 0 2.5rem .35rem 0; font-size: 1.15rem; }
-.film-content p { margin: 0; color: #686c79; }
-.availability { position: absolute; top: -1.1rem; right: 1rem; width: 1rem; height: 1rem; border: 3px solid white; border-radius: 50%; }
-.available { background: #35a45f; }
-.unavailable { background: #d44343; }
-.favorite { position: absolute; top: .65rem; right: .75rem; border: 0; background: transparent; color: #9b7200; font-size: 1.55rem; cursor: pointer; }
-.selection { margin-top: 2rem; padding: 1rem; background: #e1e7ff; border-radius: .5rem; }
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1a1f30;
+  background: #f4f2ee;
+}
 
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+button, input {
+  font: inherit;
+}
+
+/* ==========================================================================
+   Accessibilité Focus & Utilitaires
+   ========================================================================== */
+
+/* Indicateur de focus haute visibilité (Navigation Clavier) */
+:focus-visible {
+  outline: 3px solid #3b82f6 !important;
+  outline-offset: 3px !important;
+}
+
+/* Classe utilitaire pour masquer visuellement tout en restant lisible par les lecteurs d'écran */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Lien d'évitement (Skip Link) */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: #16192a;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  z-index: 1000;
+  transition: top 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* ==========================================================================
+   Header & Topbar
+   ========================================================================== */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem max(1.25rem, calc((100% - 70rem) / 2));
+  background: #16192a;
+  color: white;
+}
+
+.brand-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 0.25rem 0.5rem;
+  margin: -0.25rem -0.5rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  cursor: pointer;
+  border-radius: 0.35rem;
+}
+
+.brand-btn:hover {
+  opacity: 0.9;
+}
+
+.menu {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.menu a {
+  color: #dadbea;
+  text-decoration: none;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.35rem;
+  font-weight: 500;
+}
+
+.menu a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   Page & Recherche
+   ========================================================================== */
+
+.page {
+  flex: 1;
+  width: min(70rem, calc(100% - 2.5rem));
+  margin: 2.5rem auto;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  color: #16192a;
+}
+
+.intro {
+  color: #4b5266;
+  margin: 0 0 1.5rem 0;
+  font-size: 1.05rem;
+}
+
+.search-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.search-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  color: #2b3145;
+}
+
+.search {
+  width: min(28rem, 100%);
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #8d92a4;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #16192a;
+}
+
+.search:focus {
+  border-color: #3b82f6;
+}
+
+/* ==========================================================================
+   Grille & Cartes de Films
+   ========================================================================== */
+
+.film-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.5rem;
+}
+
+.film-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.8rem;
+  background: white;
+  box-shadow: 0 4px 18px #23263a1c;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.film-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px #23263a2a;
+}
+
+.film-card-selected {
+  outline: 2px solid #3b82f6;
+}
+
+.film-card-action {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  font: inherit;
+}
+
+.film-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+
+.film-content {
+  position: relative;
+  padding: 1rem;
+  flex: 1;
+}
+
+.film-title {
+  margin: 0 2.5rem 0.35rem 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #16192a;
+}
+
+.film-meta {
+  margin: 0;
+  color: #4b5266;
+  font-size: 0.95rem;
+}
+
+/* Disponibilité */
+.availability {
+  position: absolute;
+  top: -1.1rem;
+  right: 1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.available {
+  background: #238636;
+}
+
+.unavailable {
+  background: #cf222e;
+}
+
+/* Bouton Favori */
+.favorite {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  color: #8c6600;
+  font-size: 1.55rem;
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.favorite:hover {
+  transform: scale(1.1);
+  background: #ffffff;
+}
+
+.favorite-active {
+  color: #b45309;
+}
+
+/* ==========================================================================
+   Notification dynamique & Infos
+   ========================================================================== */
+
+.selection-container {
+  min-height: 2rem;
+}
+
+.selection {
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
+  background: #e1e7ff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 0.5rem;
+  color: #1e293b;
+  font-size: 1.05rem;
+}
+
+.infos-section {
+  margin-top: 3.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #d4d7e2;
+}
+
+.infos-section h2 {
+  font-size: 1.4rem;
+  color: #16192a;
+  margin-bottom: 0.75rem;
+}
+
+.infos-section p {
+  color: #4b5266;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Footer & Binôme
+   ========================================================================== */
+
+.footer {
+  background: #16192a;
+  color: #c9cddb;
+  padding: 2rem max(1.25rem, calc((100% - 70rem) / 2));
+  margin-top: 4rem;
+  border-top: 1px solid #282e4a;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.footer-content p {
+  margin: 0;
+}
+
+.author-name {
+  color: #ffffff;
+  font-weight: 600;
+}
